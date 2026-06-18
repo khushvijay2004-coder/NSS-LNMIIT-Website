@@ -1,36 +1,195 @@
-# NSS LNMIIT Website
 
-A modern web platform developed for the National Service Scheme (NSS) at LNMIIT to streamline event management, member engagement, and information dissemination.
+# NSS Lnmiit Website
 
-## Overview
+## 1. Main Features of the Website
 
-The NSS LNMIIT Website serves as a centralized platform for students and volunteers to stay informed about NSS activities, register for events, and engage with the community. The application focuses on usability, scalability, and performance while providing a seamless user experience.
+The NSS Lnmiit website provides the following key features:
 
-## Features
+*   **User Authentication:** Allows users to register and log in to access personalized content and features.
+*   **Role-Based Access Control:** Different features and content are accessible based on the user's assigned role (Admin, Coordinator, Member).
+*   **User Approval Workflow:** New user registrations require approval before full access is granted.
+*   **Event Management:**
+    *   Creation and updating of events (likely by specific roles).
+    *   Viewing a list of approved events.
+    *   Viewing detailed information about individual events.
+    *   Event status management (pending, approved, rejected) (likely by Admin).
+    *   Event registration for members.
+    *   Attendance tracking for registered members.
+*   **Testimonial Submission:** Authenticated users can submit testimonials related to events.
+*   **Profile Management:** Users can update their profile information.
+*   **Photo Gallery:** Displays photo albums related to NSS activities.
+*   **Contact Page:** Provides contact information.
+*   **Static Pages:** Includes a home page for guests and potentially other informational pages (About, Initiatives, Reach Section).
 
-- User authentication using Firebase Authentication
-- Event announcements and registrations
-- Responsive design for mobile and desktop devices
-- Member dashboard for managing activities
-- REST API integration
-- Reusable React component architecture
-- Performance optimization through lazy loading
+## 2. User Roles and What They Can Do
 
-## Tech Stack
+The website defines the following user roles with varying levels of access and capabilities:
 
-### Frontend
-- ReactJS
-- JavaScript (ES6+)
-- HTML5
-- CSS3
+*   **Guest:** Can view public pages such as the guest home page, contact page, and photo gallery. Cannot access authenticated features like dashboards, event registration, or profile management.
+*   **Member:** Authenticated and approved users. Can access the Member Dashboard, view approved events, register for events, submit testimonials, and manage their profile.
+*   **Coordinator:** Authenticated and approved users with coordinator privileges. Can access the Coordinator Dashboard, view approved events, and potentially update event details.
+*   **Admin:** Authenticated and approved users with administrative privileges. Can access the Admin Dashboard, manage event statuses (approve/reject), and manage members (likely including approval of new users).
 
-### Backend & Services
-- Firebase Authentication
-- REST APIs
+## 3. Data Entities and Relationships
 
-### Tools
-- Git
-- GitHub
+The core data entities in the system are:
+
+*   **User:** Represents a user of the website.
+    *   Fields: username, email, password, role (member, admin, coordinator), firstName, lastName, profilePic, firstLogin, approved, department.
+    *   Relationships:
+        *   One-to-many with Event (as `createdBy` and `approvedBy`).
+        *   Many-to-many with Event (through `registeredMembers` array).
+        *   One-to-many with Testimonial (as `author`).
+*   **Event:** Represents an NSS event.
+    *   Fields: title, description, date, createdBy, approvedBy, status (pending, approved, rejected), venue, startTime, endTime, coverPhoto, registeredMembers, attendanceLocked.
+    *   Relationships:
+        *   Many-to-one with User (for `createdBy` and `approvedBy`).
+        *   Many-to-many with User (through `registeredMembers` array).
+        *   One-to-many with Testimonial (as `event`).
+*   **Testimonial:** Represents a user's testimonial about an event.
+    *   Fields: event, author, content, status (pending, approved, rejected).
+    *   Relationships:
+        *   Many-to-one with Event.
+        *   Many-to-one with User (as `author`).
+
+## 4. Key Forms and Their Fields
+
+The following are key forms identified in the frontend:
+
+*   **Event Form:** Used for creating and updating events.
+    *   Fields: Title, Description, Date, Venue, Start Time, End Time, Cover Photo.
+*   **Profile Form:** Used for updating user profile information.
+    *   Fields: First Name, Last Name, Profile Picture URL.
+*   **Testimonial Form:** Used for submitting testimonials.
+    *   Fields: Select Event, Your Testimonial (content).
+*   **Login Form:** (Inferred) Fields: Username/Email, Password.
+*   **Register Form:** (Inferred) Fields: Username, Email, Password, First Name, Last Name, Department.
+
+## 5. Reports Generated by the System
+
+Based on the data entities and relationships, the system could potentially generate the following reports:
+
+*   **Event Attendance Reports:** Listing registered members and their attendance status for specific events.
+*   **Event Status Reports:** Showing the number of events in each status (pending, approved, rejected).
+*   **User Reports:** Listing users by role, approval status, or department.
+*   **Testimonial Reports:** Listing testimonials by event or status.
+
+(Note: The existence of these reports is inferred from the data structure; specific report generation features would need to be confirmed by examining backend controller logic or dedicated reporting modules if they exist).
+
+## 6. Project Structure
+
+```
+.
+├── Readme.md
+├── backend/
+│   ├── .env
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── server.js
+│   ├── config/
+│   │   └── ...
+│   ├── controllers/
+│   │   ├── authController.js
+│   │   ├── eventController.js
+│   │   ├── testimonialController.js
+│   │   └── userController.js
+│   ├── middlewares/
+│   │   └── authMiddleware.js
+│   ├── models/
+│   │   ├── Event.js
+│   │   ├── Testimonial.js
+│   │   └── User.js
+│   ├── routes/
+│   │   ├── authRoutes.js
+│   │   ├── eventRoutes.js
+│   │   ├── testimonialRoutes.js
+│   │   └── userRoutes.js
+│   └── utils/
+│       └── jwt.js
+├── Certificate Generator/
+│   ├── index.html
+│   ├── script.js
+│   └── style.css
+├── frontend/
+│   ├── .gitignore
+│   ├── eslint.config.js
+│   ├── index.html
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── vite.config.js
+│   ├── src/
+│   │   ├── App.jsx
+│   │   ├── index.css
+│   │   ├── main.jsx
+│   │   ├── api/
+│   │   │   └── axios.js
+│   │   ├── components/
+│   │   │   ├── EventForm.jsx
+│   │   │   ├── EventList.jsx
+│   │   │   ├── Navbar.jsx
+│   │   │   ├── ProfileForm.jsx
+│   │   │   ├── Quicklinks.jsx
+│   │   │   ├── Sidebar.jsx
+│   │   │   ├── TestimonialCard.jsx
+│   │   │   ├── TestimonialForm.jsx
+│   │   │   ├── Auth/
+│   │   │   │   ├── Login.jsx
+│   │   │   │   └── Register.jsx
+│   │   │   ├── Dashboard/
+│   │   │   │   ├── AdminDashboard.jsx
+│   │   │   │   ├── CoordinatorDashboard.jsx
+│   │   │   │   └── MemberDashboard.jsx
+│   │   │   └── Layout/
+│   │   │       ├── Navbar.jsx
+│   │   │       └── Sidebar.jsx
+│   │   ├── context/
+│   │   │   ├── AuthContext.jsx
+│   │   │   └── EventContext.jsx
+│   │   └── pages/
+│   │       ├── EventDetails.jsx
+│   │       ├── GuestHome.jsx
+│   │       ├── Home.jsx
+│   │       ├── ManageMembers.jsx
+│   │       ├── NotApproved.jsx
+│   │       ├── Posts.jsx
+│   │       ├── Profile.jsx
+│   │       ├── Welcome.jsx
+│   │       ├── Contactpage/
+│   │       │   ├── ContactPage.jsx
+│   │       │   └── Resources/
+│   │       │       └── ... (image files)
+│   │       ├── Events/
+│   │       │   ├── EventCard.jsx
+│   │       │   ├── EventDetails.jsx
+│   │       │   ├── EventList2.jsx
+│   │       │   └── Events.js
+│   │       ├── Homepage/
+│   │       │   ├── About.jsx
+│   │       │   ├── Footer.jsx
+│   │       │   ├── Hero.jsx
+│   │       │   ├── Initiatives.jsx
+│   │       │   ├── Navbar.jsx
+│   │       │   ├── ReachSection.jsx
+│   │       │   ├── TestimonialSlider.jsx
+│   │       │   └── Resources/
+│   │       │       └── ... (image files)
+│   │       └── PhotoGallery/
+│   │           ├── Album.js
+│   │           ├── AlbumCard.jsx
+│   │           ├── AlbumsData.js
+│   │           ├── PhotoGallery.jsx
+│   │           ├── PhotoViewer.jsx
+│   │           └── resources/
+│   │               └── ... (image files in various subdirectories)
+│   └── Resources/
+│       └── logo.png
+└── memory-bank/
+    ├── activeContext.md
+    ├── productContext.md
+    ├── progress.md
+    ├── projectbrief.md
+    ├── systemPatterns.md
+    └── techContext.md
 - Firebase
 
  
